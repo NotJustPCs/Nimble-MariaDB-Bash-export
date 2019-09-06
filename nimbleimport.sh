@@ -78,7 +78,7 @@ then
 				    do
 	   					insert_values="'$rec_nimb_cont_id','$sql_field','$modifier','$value','$label'"
     					insert_fields="cont_id,field,modifier,value,label"
-				    done < <$(jq -r ".[].${nimble_ref}" <<< "$cont_full")
+				    done < <(jq -r ".[].${nimble_ref}" <<< "$cont_full")
         			insert_statement="INSERT INTO $target_table ($insert_fields) VALUES ($insert_values)"
 		        	echo "Insert statement: $insert_statement"
 			        $db_connect "$insert_statement"
