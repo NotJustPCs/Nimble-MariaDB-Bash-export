@@ -73,6 +73,8 @@ then
 			do
 				if [ "$nimble_ref" != "nimble_ref" ]
 				then
+					echo "$nimble_ref"
+					echo jq -r ".[].${nimble_ref}"
 				    #This needs to read each value in with nimble_ref, and insert them all into a table. So another JQ loop through the value from the table.
 				    while read -r modifier value label
 				    do
