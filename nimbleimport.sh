@@ -106,6 +106,7 @@ then
 										detail="${detail::-2}"
 										detailvalue="${detailvalue::-2}"
 									fi
+									detail=${detail//\"/}
 									detailvalue=${detailvalue//\"/}
 									insert_values="'$rec_nimb_cont_id','$sql_field','$modifier','$detailvalue','$label','$detail'"
 									insert_fields="cont_id,field,modifier,value,label,detail"
