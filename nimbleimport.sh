@@ -91,8 +91,11 @@ then
 						then
 							while read -r detail detailvalue
 							do
+								echo "$detail"
 								detail=${detail:1}
+								echo "$detail"
 								detail=${detail::-2}
+								echo "$detail"
 								detailvalue=${detailvalue:1}
 								detailvalue=${detailvalue::-2}
 								insert_values="'$rec_nimb_cont_id','$sql_field','$modifier','$detailvalue','$label','$detail'"
