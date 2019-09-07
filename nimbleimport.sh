@@ -93,11 +93,11 @@ then
 							do
 								if [ $detail == "{" ] || [ $detail == "}" ]
 								then
-									pointless = "Very"
+									pointless="Very"
 								else
 									detail="${detail:1}"
 									detailvalue="${detailvalue:1}"
-									checkchars=${detail: -1} ${detailvalue: -1}
+									checkchars="${detail: -1} ${detailvalue: -1}"
 									echo "$checkchars"
 									#if [ 
 									#then
