@@ -79,19 +79,28 @@ then
 					for ((i=0;i<=10000;i++))
 				    do
 						currentdetailset=$(jq -r ".[].${nimble_ref}[$i].modifier" <<< "$cont_full")
-						echo "$currentdetailset"
+						#echo "$currentdetailset"
 						if [ -z "$currentdetailset" ] || [ $currentdetailset == "null" ]
 						then
 							break
 						fi
 						modifier=$(jq -r ".[].${nimble_ref}[$i].modifier" <<< "$cont_full")
-						value=$(jq -r ".[].${nimble_ref}[$i].value" <<< "$cont_full")
 						label=$(jq -r ".[].${nimble_ref}[$i].label" <<< "$cont_full")
-	   					insert_values="'$rec_nimb_cont_id','$sql_field','$modifier','$value','$label'"
-    					insert_fields="cont_id,field,modifier,value,label"
-						insert_statement="INSERT INTO $target_table ($insert_fields) VALUES ($insert_values)"
-						echo "Insert statement: $insert_statement"
-						$db_connect "$insert_statement"
+						value=$(jq -r ".[].${nimble_ref}[$i].value" <<< "$cont_full")
+						if [[ ${value:0:1} == "{" ]]
+						then
+							while read -r detail detailvalue
+							do
+								echo "$detail"
+								echo "$detailvalue"
+							done < <(jq -r "." <<< "$value")
+						else
+							insert_values="'$rec_nimb_cont_id','$sql_field','$modifier','$value','$label'"
+							insert_fields="cont_id,field,modifier,value,label"
+							insert_statement="INSERT INTO $target_table ($insert_fields) VALUES ($insert_values)"
+							#echo "Insert statement: $insert_statement"
+							$db_connect "$insert_statement"
+						fi
 				    done
 				fi
 			done < <($db_connect "SELECT DISTINCT nimble_ref, sql_field FROM etl_mapping WHERE map_profile = 'cont_det' AND sql_table = '$target_table'")
