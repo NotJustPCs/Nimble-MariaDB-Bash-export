@@ -16,6 +16,8 @@ then
 	$db_connect "$query"
 	query="$trunc_statement rec_nimb_cont_det"
 	$db_connect "$query"
+	query="$trunc_statement rec_nimb_cont_det_sub"
+	$db_connect "$query"
 fi
 
 if [ $recids -eq 1 ]
