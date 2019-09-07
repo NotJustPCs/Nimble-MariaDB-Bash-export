@@ -91,6 +91,10 @@ then
 						then
 							while read -r detail detailvalue
 							do
+								if [ $detail == "{" ] || [ $detail == "}" ]
+								then
+									break
+								fi
 								echo "$detail"
 								detail="${detail:1}"
 								echo "$detail"
