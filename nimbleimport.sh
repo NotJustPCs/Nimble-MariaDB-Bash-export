@@ -93,15 +93,20 @@ then
 							do
 								if [ $detail == "{" ] || [ $detail == "}" ]
 								then
-									echo "Skip"
+									pointless = "Very"
 								else
-									echo "$detail"
 									detail="${detail:1}"
-									echo "$detail"
-									detail="${detail::-2}"
-									echo "$detail"
 									detailvalue="${detailvalue:1}"
+									checkchars=${detail: -1} ${detailvalue: -1}
+									echo "$checkchars"
+									#if [ 
+									#then
+									#else
+									#fi
+									#If the last char is : or , then -2, otherwise -1
+									detail="${detail::-2}"
 									detailvalue="${detailvalue::-2}"
+
 									insert_values="'$rec_nimb_cont_id','$sql_field','$modifier','$detailvalue','$label','$detail'"
 									insert_fields="cont_id,field,modifier,value,label,detail"
 									insert_statement="INSERT INTO $target_table ($insert_fields) VALUES ($insert_values)"
