@@ -25,7 +25,7 @@ then
 
 	END=$total_pages
 	for ((i=1;i<=END;i++)); do
-		echo $i
+		#echo $i
 		id_set=$( curl -H "$auth_bearer" https://api.nimble.com/api/v1/contacts/ids?page=$i | jq --raw-output '.resources' )
 		id_set="${id_set:4}"
 		id_set=${id_set//\"/}
@@ -76,14 +76,20 @@ then
 					echo ".[].${nimble_ref}."
 					echo jq -r ".[].${nimble_ref}."
 				    #This needs to read each value in with nimble_ref, and insert them all into a table. So another JQ loop through the value from the table.
-				    while read -r modifier value label
+					for ((i=0;i<=10000;i++))
 				    do
+						if [ -z $(jq -r ".[].${nimble_ref}[$i].modifier" <<< "$cont_full") ]
+							break
+						fi
+						modifier=$(jq -r ".[].${nimble_ref}[$i].modifier" <<< "$cont_full")
+						value=$(jq -r ".[].${nimble_ref}[$i].value" <<< "$cont_full")
+						label=$(jq -r ".[].${nimble_ref}[$i].label" <<< "$cont_full")
 	   					insert_values="'$rec_nimb_cont_id','$sql_field','$modifier','$value','$label'"
     					insert_fields="cont_id,field,modifier,value,label"
-				    done < <(jq -r ".[].${nimble_ref}" <<< "$cont_full")
-        			insert_statement="INSERT INTO $target_table ($insert_fields) VALUES ($insert_values)"
-		        	echo "Insert statement: $insert_statement"
-			        $db_connect "$insert_statement"
+						insert_statement="INSERT INTO $target_table ($insert_fields) VALUES ($insert_values)"
+						echo "Insert statement: $insert_statement"
+						$db_connect "$insert_statement"
+				    done
 				fi
 			done < <($db_connect "SELECT DISTINCT nimble_ref, sql_field FROM etl_mapping WHERE map_profile = 'cont_det' AND sql_table = '$target_table'")
 		fi
