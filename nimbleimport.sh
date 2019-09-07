@@ -98,7 +98,7 @@ then
 									detail="${detail:1}"
 									detailvalue="${detailvalue:1}"
 									checkchars="${detail: -1} ${detailvalue: -1}"
-									if [ $checkchars == *","* ] || [ $checkchars == *":"* ]
+									if [[ $checkchars == *","* ]] || [[ $checkchars == *":"* ]]
 									then
 										detail="${detail::-1}"
 										detailvalue="${detailvalue::-1}"									
