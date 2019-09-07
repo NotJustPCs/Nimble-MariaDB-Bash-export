@@ -78,7 +78,8 @@ then
 				    #This needs to read each value in with nimble_ref, and insert them all into a table. So another JQ loop through the value from the table.
 					for ((i=0;i<=10000;i++))
 				    do
-						if [ -z $(jq -r ".[].${nimble_ref}[$i].modifier" <<< "$cont_full") ]
+						currentdetailset=$(jq -r ".[].${nimble_ref}[$i].modifier" <<< "$cont_full")
+						if [ -z "$currentdetailset" ]
 						then
 							break
 						fi
