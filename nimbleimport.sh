@@ -80,7 +80,7 @@ then
 				    do
 						currentdetailset=$(jq -r ".[].${nimble_ref}[$i].modifier" <<< "$cont_full")
 						echo "$currentdetailset"
-						if [ -z "$currentdetailset" ]
+						if [ -z "$currentdetailset" ] || [ $currentdetailset == "null"]
 						then
 							break
 						fi
