@@ -98,8 +98,7 @@ then
 									detail="${detail:1}"
 									detailvalue="${detailvalue:1}"
 									checkchars="${detail: -1} ${detailvalue: -1}"
-									echo "$checkchars"
-									if [ $checkchars == *"{"* ] || [ $checkchars == *"}"* ]
+									if [ $checkchars == *","* ] || [ $checkchars == *":"* ]
 									then
 										detail="${detail::-1}"
 										detailvalue="${detailvalue::-1}"									
@@ -110,7 +109,6 @@ then
 									insert_values="'$rec_nimb_cont_id','$sql_field','$modifier','$detailvalue','$label','$detail'"
 									insert_fields="cont_id,field,modifier,value,label,detail"
 									insert_statement="INSERT INTO $target_table ($insert_fields) VALUES ($insert_values)"
-									echo "Insert statement: $insert_statement"
 									$db_connect "$insert_statement"								
 								fi
 							done < <(jq -r "." <<< "$value")
