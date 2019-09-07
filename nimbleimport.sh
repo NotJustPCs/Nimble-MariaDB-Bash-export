@@ -79,6 +79,7 @@ then
 					for ((i=0;i<=10000;i++))
 				    do
 						if [ -z $(jq -r ".[].${nimble_ref}[$i].modifier" <<< "$cont_full") ]
+						then
 							break
 						fi
 						modifier=$(jq -r ".[].${nimble_ref}[$i].modifier" <<< "$cont_full")
