@@ -93,6 +93,7 @@ then
 							do
 								if [ $detail == "{" ] || [ $detail == "}" ]
 								then
+									echo "Skip"
 								else
 									echo "$detail"
 									detail="${detail:1}"
