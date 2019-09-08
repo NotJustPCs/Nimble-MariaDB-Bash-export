@@ -3,6 +3,7 @@
 db_connect="mysql -h $db_hostname -u $db_user -p$db_pw $db_name -e"
 auth_bearer="Authorization: Bearer $api_key"
 trunc_statement="truncate "
+scrver="0.2"
 
 cont_full=""
 insert_fields=""
@@ -75,9 +76,6 @@ then
 			do
 				if [ "$nimble_ref" != "nimble_ref" ]
 				then
-					#echo ".[].${nimble_ref}."
-					#echo jq -r ".[].${nimble_ref}."
-				    #This needs to read each value in with nimble_ref, and insert them all into a table. So another JQ loop through the value from the table.
 					for ((i=0;i<=10000;i++))
 				    do
 						currentdetailset=$(jq -r ".[].${nimble_ref}[$i].modifier" <<< "$cont_full")
