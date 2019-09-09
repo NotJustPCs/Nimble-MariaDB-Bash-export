@@ -80,9 +80,9 @@ then
 			do
 				if [ "$nimble_ref" != "nimble_ref" ]
 				then
-					childids=$(jq --raw-output ".[].${nimble_ref}" <<< "$cont_full")
+					childids=$(jq -r ".[].${nimble_ref}" <<< "$cont_full")
 					childids=${childids//[$'\t\r\n']}
-					IFS=$'\t' read -r -a childidarr <<< "$childids"
+					IFS= read -r -a childidarr <<< "$childids"
 					for childid in "${childidarr[@]}"
 					do
 						#childid=${childid//\"/}
