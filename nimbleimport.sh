@@ -78,10 +78,12 @@ then
 			do
 				if [ "$nimble_ref" != "nimble_ref" ]
 				then
-					
+					echo "$nimble_ref"
 					childids=$(jq -r ".[].${nimble_ref}" <<< "$cont_full")
+					echo "$childids"
 					while read -r childid
 					do
+						echo "$childid"
 						childid=${childid//\"/}
 						insert_values="'$rec_nimb_cont_id','$sql_field'"
 						insert_fields="cont_id,'$sql_field'"
