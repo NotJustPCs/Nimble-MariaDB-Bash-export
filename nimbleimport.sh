@@ -31,10 +31,11 @@ then
 		#echo $i
 		id_set=$( curl -H "$auth_bearer" https://api.nimble.com/api/v1/contacts/ids?page=$i | jq --raw-output '.resources' )
 		id_set="${id_set:4}"
-		id_set=${id_set//\"/}
+		#id_set=${id_set//\"/}
 		id_set=${id_set//[$'\t\r\n']}
 		id_set=${id_set//[[:blank:]]/}
-		id_set=${id_set//,/ }
+		#id_set=${id_set//,/ }
+		id_set=${str//[[\],.!"]}
 		IFS=', ' read -r -a id_arr <<< "$id_set"
 		for id_single in "${id_arr[@]}"
 		do
