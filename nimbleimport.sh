@@ -78,10 +78,11 @@ then
 			do
 				if [ "$nimble_ref" != "nimble_ref" ]
 				then
-					echo ".[].$nimble_ref"
 					childids=$(jq -r ".[].${nimble_ref}" <<< "$cont_full")
 					echo "childids $childids"
-					while read -r childid
+
+					IFS=', ' read -r -a childidarr <<< "$childids"
+					for childid in "${childidarr[@]}"
 					do
 						echo "childid $childid"
 						childid=${childid//\"/}
@@ -89,7 +90,7 @@ then
 						insert_fields="cont_id,'$sql_field'"
 						insert_statement="INSERT INTO $target_table ($insert_fields) VALUES ($insert_values)"
 						$db_connect "$insert_statement"
-					done < <(jq -r "." <<< "$childids")
+					done
 
 				
 				
