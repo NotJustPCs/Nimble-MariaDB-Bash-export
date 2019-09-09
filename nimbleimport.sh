@@ -84,7 +84,7 @@ then
 					do
 						childid=${childid//\"/}
 						insert_values="'$rec_nimb_cont_id','$childid'"
-						insert_fields="cont_id,'$sql_field'"
+						insert_fields="cont_id,$sql_field"
 						insert_statement="INSERT INTO $target_table ($insert_fields) VALUES ($insert_values)"
 						echo "Insert statement: $insert_statement"
 						$db_connect "$insert_statement"
