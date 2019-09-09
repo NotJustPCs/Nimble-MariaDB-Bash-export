@@ -56,6 +56,8 @@ then
 		if [ "$rec_nimb_cont_id" != "nimb_cont_id" ]
 		then
 			#echo "$cont_full" >> fullcontact.txt
+			
+			#Contact details
 			target_table="rec_nimb_cont_det"
 			while IFS=$'\t' read nimble_ref sql_field;
 			do
@@ -69,6 +71,29 @@ then
 			insert_statement="INSERT INTO $target_table ($insert_fields) VALUES ($insert_values)"
 			#echo "Insert statement: $insert_statement"
 			$db_connect "$insert_statement"
+
+			#Contact child IDs
+			target_table="rec_nimb_cont_childids"
+			while IFS=$'\t' read nimble_ref sql_field;
+			do
+				if [ "$nimble_ref" != "nimble_ref" ]
+				then
+					
+					childids=$(jq -r ".[].${nimble_ref}" <<< "$cont_full")
+					while read -r childid
+					do
+						childid=${childid//\"/}
+						insert_values="'$rec_nimb_cont_id','$sql_field'"
+						insert_fields="cont_id,'$sql_field'"
+						insert_statement="INSERT INTO $target_table ($insert_fields) VALUES ($insert_values)"
+						$db_connect "$insert_statement"
+					done < <(jq -r "." <<< "$childids")
+
+				
+				
+				fi
+			done < <($db_connect "SELECT DISTINCT nimble_ref, sql_field FROM etl_mapping WHERE map_profile = 'cont_det' AND sql_table = '$target_table'")
+			insert_statement="INSERT INTO $target_table ($insert_fields) VALUES ($insert_values)"
 
 			#Sub details
 			target_table="rec_nimb_cont_det_sub"
