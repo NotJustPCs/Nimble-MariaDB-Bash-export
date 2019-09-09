@@ -40,11 +40,11 @@ then
 		id_set=${id_set//[[:blank:]]/}
 		echo "5 $id_set"
 		id_set=${id_set//,/ }
-		echo "$id_set"
-		#id_set=${str//[[\],.!\"/]}
 		echo "6 $id_set"
-		id_set=${str//[[\],.]}
+		#id_set=${str//[[\],.!\"/]}
 		echo "7 $id_set"
+		id_set=${str//[[\]]}
+		echo "8 $id_set"
 		IFS=', ' read -r -a id_arr <<< "$id_set"
 		for id_single in "${id_arr[@]}"
 		do
