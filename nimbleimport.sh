@@ -35,7 +35,7 @@ then
 		id_set=${id_set//[$'\t\r\n']}
 		id_set=${id_set//[[:blank:]]/}
 		#id_set=${id_set//,/ }
-		id_set=${str//[[\],.!"]}
+		id_set=${str//[[\],.!\"/]}
 		IFS=', ' read -r -a id_arr <<< "$id_set"
 		for id_single in "${id_arr[@]}"
 		do
