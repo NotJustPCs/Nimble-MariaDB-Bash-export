@@ -78,11 +78,11 @@ then
 			do
 				if [ "$nimble_ref" != "nimble_ref" ]
 				then
-					childids=$(jq -r ".[].${nimble_ref}" <<< "$cont_full")
+					childids=$(jq --raw-output ".[].${nimble_ref}" <<< "$cont_full")
 					IFS=$'\t' read -r -a childidarr <<< "$childids"
 					for childid in "${childidarr[@]}"
 					do
-						childid=${childid//\"/}
+						#childid=${childid//\"/}
 						insert_values="'$rec_nimb_cont_id','$childid'"
 						insert_fields="cont_id,$sql_field"
 						insert_statement="INSERT INTO $target_table ($insert_fields) VALUES ($insert_values)"
