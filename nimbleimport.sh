@@ -19,6 +19,8 @@ then
 	$db_connect "$query"
 	query="$trunc_statement rec_nimb_cont_det_sub"
 	$db_connect "$query"
+	query="$trunc_statement rec_nimb_cont_childids"
+	$db_connect "$query"
 fi
 
 if [ $recids -eq 1 ]
@@ -79,6 +81,7 @@ then
 				if [ "$nimble_ref" != "nimble_ref" ]
 				then
 					childids=$(jq --raw-output ".[].${nimble_ref}" <<< "$cont_full")
+					childids=${childids//[$'\t\r\n']}
 					IFS=$'\t' read -r -a childidarr <<< "$childids"
 					for childid in "${childidarr[@]}"
 					do
