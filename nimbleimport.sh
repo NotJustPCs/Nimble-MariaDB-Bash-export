@@ -28,7 +28,6 @@ then
 
 	END=$total_pages
 	for ((i=1;i<=END;i++)); do
-		echo "Iteration $i"
 		id_set=$( curl -H "$auth_bearer" https://api.nimble.com/api/v1/contacts/ids?page=$i | jq --raw-output '.resources' )
 		id_set="${id_set:4}"
 		id_set="${id_set::-1}"
