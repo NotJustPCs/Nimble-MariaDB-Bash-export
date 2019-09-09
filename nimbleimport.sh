@@ -28,23 +28,23 @@ then
 
 	END=$total_pages
 	for ((i=1;i<=END;i++)); do
-		echo $i
+		echo "Iteration $i"
 		id_set=$( curl -H "$auth_bearer" https://api.nimble.com/api/v1/contacts/ids?page=$i | jq --raw-output '.resources' )
-		echo "$id_set"
+		echo "1 $id_set"
 		id_set="${id_set:4}"
-		echo "$id_set"
-		#id_set=${id_set//\"/}
-		echo "$id_set"
+		echo "2 $id_set"
+		id_set=${id_set//\"/}
+		echo "3 $id_set"
 		id_set=${id_set//[$'\t\r\n']}
-		echo "$id_set"
+		echo "4 $id_set"
 		id_set=${id_set//[[:blank:]]/}
-		echo "$id_set"
+		echo "5 $id_set"
 		id_set=${id_set//,/ }
 		echo "$id_set"
 		#id_set=${str//[[\],.!\"/]}
-		echo "$id_set"
-		id_set=${str//[[\],.\"/]}
-		echo "$id_set"
+		echo "6 $id_set"
+		id_set=${str//[[\],.]}
+		echo "7 $id_set"
 		IFS=', ' read -r -a id_arr <<< "$id_set"
 		for id_single in "${id_arr[@]}"
 		do
