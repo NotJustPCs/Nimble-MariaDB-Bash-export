@@ -79,21 +79,16 @@ then
 				if [ "$nimble_ref" != "nimble_ref" ]
 				then
 					childids=$(jq -r ".[].${nimble_ref}" <<< "$cont_full")
-					echo "childids $childids"
-
 					IFS=', ' read -r -a childidarr <<< "$childids"
 					for childid in "${childidarr[@]}"
 					do
-						echo "childid $childid"
 						childid=${childid//\"/}
-						insert_values="'$rec_nimb_cont_id','$sql_field'"
+						insert_values="'$rec_nimb_cont_id','$childid'"
 						insert_fields="cont_id,'$sql_field'"
 						insert_statement="INSERT INTO $target_table ($insert_fields) VALUES ($insert_values)"
+						echo "Insert statement: $insert_statement"
 						$db_connect "$insert_statement"
 					done
-
-				
-				
 				fi
 			done < <($db_connect "SELECT DISTINCT nimble_ref, sql_field FROM etl_mapping WHERE map_profile = 'cont_det' AND sql_table = '$target_table'")
 			insert_statement="INSERT INTO $target_table ($insert_fields) VALUES ($insert_values)"
