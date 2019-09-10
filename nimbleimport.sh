@@ -86,13 +86,12 @@ then
 					childids=${childids// /[$'\t\r\n']}
 					echo "$childids"
 					echo "2nd replace here..."
-					childids=${childids//\n/ }
+					childids=${childids//\"/,}
 					echo "$childids"
 					IFS=$'\n' read -r -a childidarr <<< "$childids"
 					echo "${#childidarr[@]}"
 					for childid in "${childidarr[@]}"
 					do
-						#childid=${childid//\"/}
 						insert_values="'$rec_nimb_cont_id','$childid'"
 						insert_fields="cont_id,$sql_field"
 						insert_statement="INSERT INTO $target_table ($insert_fields) VALUES ($insert_values)"
