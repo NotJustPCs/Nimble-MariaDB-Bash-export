@@ -84,6 +84,7 @@ then
 					#childids=${childids//[$'\t\r\n']}
 					echo "$childids"
 					IFS= read -r -a childidarr <<< "$childids"
+					echo "${#childidarr[@]}"
 					for childid in "${childidarr[@]}"
 					do
 						#childid=${childid//\"/}
