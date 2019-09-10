@@ -82,17 +82,13 @@ then
 				then
 					childids=$(jq ".[].${nimble_ref}" <<< "$cont_full")
 					childids=${childids//\"/,}
-					childids=${childids//\,,/,}
 					childids=${childids//[$'\t\r\n']}
-					echo "$childids"
 					IFS=$',' read -r -a childidarr <<< "$childids"
-					echo "${#childidarr[@]}"
 					for childid in "${childidarr[@]}"
 					do
 						insert_values="'$rec_nimb_cont_id','$childid'"
 						insert_fields="cont_id,$sql_field"
 						insert_statement="INSERT INTO $target_table ($insert_fields) VALUES ($insert_values)"
-						echo "Insert statement: $insert_statement"
 						$db_connect "$insert_statement"
 					done
 				fi
