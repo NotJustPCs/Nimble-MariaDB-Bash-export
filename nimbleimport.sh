@@ -76,12 +76,13 @@ then
 
 			#Contact child IDs
 			target_table="rec_nimb_cont_childids"
-			while IFS=$'\n' read nimble_ref sql_field;
+			while IFS=$'\t' read nimble_ref sql_field;
 			do
 				if [ "$nimble_ref" != "nimble_ref" ]
 				then
 					childids=$(jq -r ".[].${nimble_ref}" <<< "$cont_full")
 					#childids=${childids//[$'\t\r\n']}
+					echo "$childids"
 					IFS=$'\n' read -r -a childidarr <<< "$childids"
 					for childid in "${childidarr[@]}"
 					do
