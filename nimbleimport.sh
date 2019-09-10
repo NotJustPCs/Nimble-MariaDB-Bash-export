@@ -80,7 +80,7 @@ then
 			do
 				if [ "$nimble_ref" != "nimble_ref" ]
 				then
-					childids=$(jq -r ".[].${nimble_ref}" <<< "$cont_full")
+					childids=$(jq ".[].${nimble_ref}" <<< "$cont_full")
 					echo "$childids"
 					echo "1st replace here..."
 					childids=${childids// /[$'\t\r\n']}
@@ -88,7 +88,7 @@ then
 					echo "2nd replace here..."
 					childids=${childids// /\\n}
 					echo "$childids"
-					IFS=$'\n\b' read -r -a childidarr <<< "$childids"
+					IFS=$'\n' read -r -a childidarr <<< "$childids"
 					echo "${#childidarr[@]}"
 					for childid in "${childidarr[@]}"
 					do
