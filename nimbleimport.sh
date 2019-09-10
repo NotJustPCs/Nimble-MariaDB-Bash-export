@@ -83,7 +83,7 @@ then
 					childids=$(jq -r ".[].${nimble_ref}" <<< "$cont_full")
 					#childids=${childids//[$'\t\r\n']}
 					echo "$childids"
-					childids=${childids// /\\n}
+					childids="${childids// /\\n}"
 					echo "$childids"
 					IFS=$'\n' read -r -a childidarr <<< "$childids"
 					echo "${#childidarr[@]}"
