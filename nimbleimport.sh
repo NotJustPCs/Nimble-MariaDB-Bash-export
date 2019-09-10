@@ -86,7 +86,7 @@ then
 					childids=${childids// /[$'\t\r\n']}
 					echo "$childids"
 					echo "2nd replace here..."
-					childids=${childids// /\\n}
+					childids=${childids//\n/ }
 					echo "$childids"
 					IFS=$'\n' read -r -a childidarr <<< "$childids"
 					echo "${#childidarr[@]}"
