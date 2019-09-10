@@ -76,7 +76,7 @@ then
 
 			#Contact child IDs
 			target_table="rec_nimb_cont_childids"
-			while IFS=$'\t' read nimble_ref sql_field;
+			while IFS=$'\n' read nimble_ref sql_field;
 			do
 				if [ "$nimble_ref" != "nimble_ref" ]
 				then
