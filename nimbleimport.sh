@@ -152,3 +152,9 @@ then
 		fi
 	done < <($db_connect "SELECT DISTINCT * FROM rec_nimb_cont_id")
 fi
+
+if [ $loadstaging -eq 1 ]
+then
+	echo "Loading Staging Tables"
+	$db_connect "call load_rectostg()"
+fi

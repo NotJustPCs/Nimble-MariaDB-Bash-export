@@ -7,3 +7,4 @@ db_pw="YOURDBPW"
 truncrec=1
 recids=1
 recdetails=1
+loadstaging=1

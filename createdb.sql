@@ -195,6 +195,140 @@ ALTER TABLE `etl_mapping`
 ALTER TABLE `etl_mapping`
   MODIFY `map_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
 COMMIT;
+-- --------------------------------------------------------
+--
+-- Views
+-- 
+CREATE OR REPLACE VIEW stgv_nimb_cont_childids AS
+SELECT DISTINCT * FROM rec_nimb_cont_childids WHERE child_cont_id <> "";
+---
+CREATE OR REPLACE VIEW stgv_nimb_cont_address AS
+SELECT DISTINCT 'cont_id', 'type', 'street', 'city', 'county', 'postcode', 'country'
+FROM stg_nimb_cont_id
+	LEFT OUTER JOIN stg_nimb_cont_address_city ON stg_nimb_cont_id.nimb_cont_id = stg_nimb_cont_address_city.cont_id
+	LEFT OUTER JOIN stg_nimb_cont_address_country ON stg_nimb_cont_id.nimb_cont_id = stg_nimb_cont_address_country.cont_id
+	LEFT OUTER JOIN stg_nimb_cont_address_county ON stg_nimb_cont_id.nimb_cont_id = stg_nimb_cont_address_county.cont_id
+	LEFT OUTER JOIN stg_nimb_cont_address_street ON stg_nimb_cont_id.nimb_cont_id = stg_nimb_cont_address_street.cont_id
+	LEFT OUTER JOIN stg_nimb_cont_address_postcode ON stg_nimb_cont_id.nimb_cont_id = stg_nimb_cont_address_postcode.cont_id;
+---
+CREATE OR REPLACE VIEW stgv_nimb_cont_address_city AS
+SELECT DISTINCT `cont_id`,`modifier` AS 'type' ,`value` AS 'city'
+FROM `rec_nimb_cont_det_sub`
+WHERE `field` = 'address' AND `detail` = 'city';
+---
+CREATE OR REPLACE VIEW stgv_nimb_cont_address_country AS
+SELECT DISTINCT `cont_id`,`modifier` AS 'type' ,`value` AS 'country'
+FROM `rec_nimb_cont_det_sub`
+WHERE `field` = 'address' AND `detail` = 'country';
+---
+CREATE OR REPLACE VIEW stgv_nimb_cont_address_county AS
+SELECT DISTINCT `cont_id`,`modifier` AS 'type' ,`value` AS 'county'
+FROM `rec_nimb_cont_det_sub`
+WHERE `field` = 'address' AND `detail` = 'state';
+---
+CREATE OR REPLACE VIEW stgv_nimb_cont_address_street AS
+SELECT DISTINCT `cont_id`,`modifier` AS 'type' ,`value` AS 'street'
+FROM `rec_nimb_cont_det_sub`
+WHERE `field` = 'address' AND `detail` = 'street';
+---
+CREATE OR REPLACE VIEW stgv_nimb_cont_address_postcode AS
+SELECT DISTINCT `cont_id`,`modifier` AS 'type' ,`value` AS 'postcode'
+FROM `rec_nimb_cont_det_sub`
+WHERE `field` = 'address' AND `detail` = 'zip';
+---
+CREATE OR REPLACE VIEW stgv_nimb_cont_phone AS
+SELECT DISTINCT `cont_id`,`modifier` AS 'type' ,`value` AS 'phone' FROM `rec_nimb_cont_det_sub` WHERE `field` = 'phone';
+---
+CREATE OR REPLACE VIEW stgv_nimb_cont_url AS
+SELECT DISTINCT `cont_id`,`modifier` AS 'type' ,`value` AS 'url' FROM `rec_nimb_cont_det_sub` WHERE `field` = 'url';
+---
+CREATE OR REPLACE VIEW stgv_nimb_cont_description AS
+SELECT DISTINCT `cont_id`,`modifier` AS 'source' ,`value` AS 'description' FROM `rec_nimb_cont_det_sub` WHERE `field` = 'description';
+---
+CREATE OR REPLACE VIEW stgv_err_missingids AS
+SELECT DISTINCT IDT.nimb_cont_id
+FROM stg_nimb_cont_id AS IDT
+WHERE IDT.nimb_cont_id NOT IN (
+    	SELECT DISTINCT DETT.cont_id
+    	FROM stg_nimb_cont_det AS DETT);
+---
+CREATE OR REPLACE VIEW stgv_load_nimb_cont_det AS
+SELECT cont_id,
+	owner_id,
+	object_type,
+	record_type,
+	convert(created, DATETIME) AS created_datetime,
+	convert(created, DATE) AS created_date,
+	convert(created, TIME) AS created_time,
+	creator,
+	convert(updated, DATETIME) AS updated_datetime,
+	convert(updated, DATE) AS updated_date,
+	convert(updated, TIME) AS updated_time,
+	updater,
+	company_name,
+	parent_company,
+	area,
+	avatar_url,
+	IF(is_important IS NOT NULL , IF(lower(is_important) = 'true' , 1 , 0) , null) AS is_important,
+	IF(reminder IS NOT NULL , IF(lower(reminder) = 'true' , 1 , 0) , null) AS reminder,
+	gender,
+	ethnicity,
+	first_name,
+	last_name,
+	form_name,
+	title,
+	email,
+	mailchimp_rating,
+	IF(any_contact IS NOT NULL , IF(lower(any_contact) = 'true' , 1 , 0) , null) AS any_contact,
+	IF(mailpref IS NOT NULL , IF(lower(mailpref) = 'true' , 1 , 0) , null) AS mailpref,
+	IF(home_contact IS NOT NULL , IF(lower(home_contact) = 'true' , 1 , 0) , null) AS home_contact,
+	IF(post IS NOT NULL , IF(lower(post) = 'true' , 1 , 0) , null) AS post,
+	IF(xmas_email IS NOT NULL , IF(lower(xmas_email) = 'true' , 1 , 0) , null) AS xmas_email,
+	IF(cop IS NOT NULL , IF(lower(cop) = 'true' , 1 , 0) , null) AS cop,
+	calendar,
+	cms_id,
+	source,
+	old_source,
+	special_needs,
+	lead_status,
+	lead_type,
+	convert(birthday, DATE) AS birthday,
+	last_qual,
+	cipd_no
+FROM rec_nimb_cont_det;
+-- --------------------------------------------------------
+--
+-- Stored Procedures
+-- 
+DELIMITER //
+CREATE OR REPLACE PROCEDURE load_rectostg()
+BEGIN
+	TRUNCATE stg_nimb_cont_id;
+	INSERT INTO stg_nimb_cont_id
+	SELECT DISTINCT * FROM rec_nimb_cont_id;
+	TRUNCATE stg_nimb_cont_id;
+	INSERT IGNORE INTO stg_nimb_cont_det
+	SELECT DISTINCT * FROM stgv_nimb_cont_det;
+	TRUNCATE stg_nimb_cont_address_city;
+	TRUNCATE stg_nimb_cont_address_country;
+	TRUNCATE stg_nimb_cont_address_county;
+	TRUNCATE stg_nimb_cont_address_street;
+	TRUNCATE stg_nimb_cont_address_postcode;
+	INSERT INTO stg_nimb_cont_address_city
+	SELECT DISTINCT * FROM stgv_nimb_cont_address_city;
+	INSERT INTO stg_nimb_cont_address_country
+	SELECT DISTINCT * FROM stgv_nimb_cont_address_country;
+	INSERT INTO stg_nimb_cont_address_county
+	SELECT DISTINCT * FROM stgv_nimb_cont_address_county;
+	INSERT INTO stg_nimb_cont_address_street
+	SELECT DISTINCT * FROM stgv_nimb_cont_address_street;
+	INSERT INTO stg_nimb_cont_address_postcode
+	SELECT DISTINCT * FROM stgv_nimb_cont_address_postcode;
+	
+END //
+DELIMITER ;
+
+-- --------------------------------------------------------
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
