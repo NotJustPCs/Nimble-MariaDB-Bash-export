@@ -1,7 +1,7 @@
 . config.sh
 
 db_connect="mysql -h $db_hostname -u $db_user -p$db_pw $db_name -e"
-echodate=date +"%d/%m/%Y %H.%M.%S -"
+echodate=$ date +"%d/%m/%Y %H.%M.%S -"
 auth_bearer="Authorization: Bearer $api_key"
 trunc_statement="truncate "
 scrver="0.4"
