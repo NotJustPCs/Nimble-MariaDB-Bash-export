@@ -1,10 +1,10 @@
 . config.sh
+. functions.sh
 
 db_connect="mysql -h $db_hostname -u $db_user -p$db_pw $db_name -e"
-echodate=$ date +"%d/%m/%Y %H.%M.%S -"
 auth_bearer="Authorization: Bearer $api_key"
 trunc_statement="truncate "
-scrver="0.4"
+scrver="0.5"
 
 cont_full=""
 insert_fields=""
@@ -13,7 +13,7 @@ nimble_ref=""
 
 if [ $truncrec -eq 1 ]
 then
-	echo "$echodate Truncating rec tables" >> $fn_logfile
+	echo "$(timestamp) Truncating rec tables" >> $fn_logfile
 	query="$trunc_statement rec_nimb_cont_id"
 	$db_connect "$query"
 	query="$trunc_statement rec_nimb_cont_det"
@@ -26,9 +26,9 @@ fi
 
 if [ $recids -eq 1 ]
 then
-	echo "$echodate Populating Contact IDs in Rec" >> $fn_logfile
+	echo "$(timestamp) Populating Contact IDs in Rec" >> $fn_logfile
 	total_pages=$( curl -H "$auth_bearer" https://api.nimble.com/api/v1/contacts/ids | jq --raw-output '.meta.pages' )
-	echo "$echodate Starting Contact ID batch loop - 1 of $total_pages pages" >> $fn_logfile
+	echo "$(timestamp) Starting Contact ID batch loop - 1 of $total_pages pages" >> $fn_logfile
 	END=$total_pages
 	for ((i=1;i<=END;i++)); do
 		id_set=$( curl -H "$auth_bearer" https://api.nimble.com/api/v1/contacts/ids?page=$i | jq --raw-output '.resources' )
@@ -44,13 +44,13 @@ then
 			query="insert into rec_nimb_cont_id (nimb_cont_id) VALUES('$id_single')"
 			$db_connect "$query"
 		done
-	echo "$echodate Completed Contact ID batch loop" >> $fn_logfile
 	done
+	echo "$(timestamp) Completed Contact ID batch loop" >> $fn_logfile
 fi
 
 if [ $recdetails -eq 1 ]
 then
-	echo "$echodate Populating Contact Details" >> $fn_logfile
+	echo "$(timestamp) Populating Contact Details" >> $fn_logfile
 	rm $fn_contactjson
 	while read rec_nimb_cont_id
 	do
@@ -59,7 +59,8 @@ then
 		cont_full=$( curl -H "$auth_bearer" https://api.nimble.com/api/v1/contact/$rec_nimb_cont_id | jq --raw-output '.resources' )
 		if [ "$rec_nimb_cont_id" != "nimb_cont_id" ]
 		then
-			echo "$cont_full" >> $fn_contactjson
+			completerecord=$(jq -r ".[]" <<< "$cont_full")
+			echo "$completerecord" >> $fn_contactjson
 			
 			#Contact details
 			target_table="rec_nimb_cont_det"
@@ -73,7 +74,7 @@ then
 				fi
 			done < <($db_connect "SELECT DISTINCT nimble_ref, sql_field FROM etl_mapping WHERE map_profile = 'cont_det' AND sql_table = '$target_table'")
 			insert_statement="INSERT INTO $target_table ($insert_fields) VALUES ($insert_values)"
-			#echo "$echodate Insert statement: $insert_statement" >> $fn_logfile
+			#echo "$(timestamp) Insert statement: $insert_statement" >> $fn_logfile
 			$db_connect "$insert_statement"
 
 			#Contact child IDs
@@ -106,7 +107,7 @@ then
 					for ((i=0;i<=10000;i++))
 				    do
 						currentdetailset=$(jq -r ".[].${nimble_ref}[$i].modifier" <<< "$cont_full")
-						#echo "$echodate Current detail set: $currentdetailset" >> $fn_logfile
+						#echo "$(timestamp) Current detail set: $currentdetailset" >> $fn_logfile
 						if [ -z "$currentdetailset" ] || [ $currentdetailset == "null" ]
 						then
 							break
@@ -145,7 +146,7 @@ then
 							insert_values="'$rec_nimb_cont_id','$sql_field','$modifier','$value','$label'"
 							insert_fields="cont_id,field,modifier,value,label"
 							insert_statement="INSERT INTO $target_table ($insert_fields) VALUES ($insert_values)"
-							#echo "$echodate Insert statement: $insert_statement" >> $fn_logfile
+							#echo "$(timestamp) Insert statement: $insert_statement" >> $fn_logfile
 							$db_connect "$insert_statement"
 						fi
 				    done
@@ -157,6 +158,6 @@ fi
 
 if [ $loadstaging -eq 1 ]
 then
-	echo "$echodate Loading Staging Tables" >> $fn_logfile
+	echo "$(timestamp) Loading Staging Tables" >> $fn_logfile
 	$db_connect "call load_rectostg()"
 fi
