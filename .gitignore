@@ -3,3 +3,6 @@ config.sh
 
 # Log files
 *.log
+
+# JSON files
+*.json
