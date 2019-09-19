@@ -1,3 +1,3 @@
 timestamp() {
-  date +"%T"
+  date +"%D %T"
 }

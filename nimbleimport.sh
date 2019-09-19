@@ -136,8 +136,8 @@ then
 									fi
 									detail=${detail//\"/}
 									detailvalue=${detailvalue//\"/}
-									insert_values="'$rec_nimb_cont_id','$sql_field','$modifier','$detailvalue','$label','$detail'"
-									insert_fields="cont_id,field,modifier,value,label,detail"
+									insert_values="'$rec_nimb_cont_id','$sql_field','$modifier','$detailvalue','$label','$detail','$i'"
+									insert_fields="cont_id,field,modifier,value,label,detail,address_id"
 									insert_statement="INSERT INTO $target_table ($insert_fields) VALUES ($insert_values)"
 									$db_connect "$insert_statement"								
 								fi
