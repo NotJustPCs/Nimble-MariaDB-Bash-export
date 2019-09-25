@@ -202,40 +202,104 @@ COMMIT;
 CREATE OR REPLACE VIEW stgv_nimb_cont_childids AS
 SELECT DISTINCT * FROM rec_nimb_cont_childids WHERE child_cont_id <> "";
 ---
-CREATE OR REPLACE VIEW stgv_nimb_cont_address AS
-SELECT DISTINCT 'cont_id', 'type', 'street', 'city', 'county', 'postcode', 'country'
-FROM stg_nimb_cont_id
-	LEFT OUTER JOIN stg_nimb_cont_address_city ON stg_nimb_cont_id.nimb_cont_id = stg_nimb_cont_address_city.cont_id
-	LEFT OUTER JOIN stg_nimb_cont_address_country ON stg_nimb_cont_id.nimb_cont_id = stg_nimb_cont_address_country.cont_id
-	LEFT OUTER JOIN stg_nimb_cont_address_county ON stg_nimb_cont_id.nimb_cont_id = stg_nimb_cont_address_county.cont_id
-	LEFT OUTER JOIN stg_nimb_cont_address_street ON stg_nimb_cont_id.nimb_cont_id = stg_nimb_cont_address_street.cont_id
-	LEFT OUTER JOIN stg_nimb_cont_address_postcode ON stg_nimb_cont_id.nimb_cont_id = stg_nimb_cont_address_postcode.cont_id;
----
 CREATE OR REPLACE VIEW stgv_nimb_cont_address_city AS
-SELECT DISTINCT `cont_id`,`modifier` AS 'type' ,`value` AS 'city'
-FROM `rec_nimb_cont_det_sub`
-WHERE `field` = 'address' AND `detail` = 'city';
+SELECT DISTINCT cont_id
+	,modifier AS 'type'
+	,value AS 'city'
+	,address_id AS 'address_subid'
+	,CONCAT_WS("-",cont_id,modifier,CONVERT(address_id, VARCHAR(10))) AS address_join
+FROM rec_nimb_cont_det_sub
+WHERE field = 'address'
+	AND detail = 'city';
 ---
 CREATE OR REPLACE VIEW stgv_nimb_cont_address_country AS
-SELECT DISTINCT `cont_id`,`modifier` AS 'type' ,`value` AS 'country'
-FROM `rec_nimb_cont_det_sub`
-WHERE `field` = 'address' AND `detail` = 'country';
+SELECT DISTINCT cont_id
+	,modifier AS 'type'
+	,value AS 'country'
+	,address_id AS 'address_subid'
+	,CONCAT_WS("-",cont_id,modifier,CONVERT(address_id, VARCHAR(10))) AS address_join
+FROM rec_nimb_cont_det_sub
+WHERE field = 'address'
+	AND detail = 'country';
 ---
 CREATE OR REPLACE VIEW stgv_nimb_cont_address_county AS
-SELECT DISTINCT `cont_id`,`modifier` AS 'type' ,`value` AS 'county'
-FROM `rec_nimb_cont_det_sub`
-WHERE `field` = 'address' AND `detail` = 'state';
+SELECT DISTINCT cont_id
+	,modifier AS 'type'
+	,value AS 'county'
+	,address_id AS 'address_subid'
+	,CONCAT_WS("-",cont_id,modifier,CONVERT(address_id, VARCHAR(10))) AS address_join
+FROM rec_nimb_cont_det_sub
+WHERE field = 'address'
+	AND detail = 'state';
 ---
 CREATE OR REPLACE VIEW stgv_nimb_cont_address_street AS
-SELECT DISTINCT `cont_id`,`modifier` AS 'type' ,`value` AS 'street'
-FROM `rec_nimb_cont_det_sub`
-WHERE `field` = 'address' AND `detail` = 'street';
+SELECT DISTINCT cont_id
+	,modifier AS 'type'
+	,value AS 'street'
+	,address_id AS 'address_subid'
+	,CONCAT_WS("-",cont_id,modifier,CONVERT(address_id, VARCHAR(10))) AS address_join
+FROM rec_nimb_cont_det_sub
+WHERE field = 'address'
+	AND detail = 'street';
 ---
 CREATE OR REPLACE VIEW stgv_nimb_cont_address_postcode AS
-SELECT DISTINCT `cont_id`,`modifier` AS 'type' ,`value` AS 'postcode'
-FROM `rec_nimb_cont_det_sub`
-WHERE `field` = 'address' AND `detail` = 'zip';
+SELECT DISTINCT cont_id
+	,modifier AS 'type'
+	,value AS 'postcode'
+	,address_id AS 'address_subid'
+	,CONCAT_WS("-",cont_id,modifier,CONVERT(address_id, VARCHAR(10))) AS address_join
+FROM rec_nimb_cont_det_sub
+WHERE field = 'address'
+	AND detail = 'zip';
 ---
+CREATE OR REPLACE VIEW stgv_nimb_cont_address_ids AS
+SELECT DISTINCT *
+	,CONCAT_WS("-",cont_id,type,CONVERT(address_subid, VARCHAR(10))) AS address_join
+FROM (
+SELECT cont_id
+	,type
+	,address_subid
+FROM stgv_nimb_cont_address_city AS address_city
+UNION ALL
+SELECT cont_id
+	,type
+	,address_subid
+FROM stgv_nimb_cont_address_country AS address_country
+UNION ALL
+SELECT cont_id
+	,type
+	,address_subid
+FROM stgv_nimb_cont_address_county AS address_county
+UNION ALL
+SELECT cont_id
+	,type
+	,address_subid
+FROM stgv_nimb_cont_address_postcode AS address_postcode
+UNION ALL
+SELECT cont_id
+	,type
+	,address_subid
+FROM stgv_nimb_cont_address_street AS address_street) AS address_all
+ORDER BY 1,2,3
+---
+CREATE OR REPLACE VIEW stgv_nimb_cont_address AS
+SELECT DISTINCT AllIDs.cont_id
+	,AllIDs.type
+	,AllIDs.address_subid
+	,street
+	,city
+	,county
+	,postcode
+	,country
+FROM stgv_nimb_cont_address_ids AS AllIDs
+	LEFT OUTER JOIN stgv_nimb_cont_address_city ON BINARY AllIDs.address_join = BINARY stgv_nimb_cont_address_city.address_join
+	LEFT OUTER JOIN stgv_nimb_cont_address_country ON BINARY AllIDs.address_join = BINARY stgv_nimb_cont_address_country.address_join
+	LEFT OUTER JOIN stgv_nimb_cont_address_county ON BINARY AllIDs.address_join = BINARY stgv_nimb_cont_address_county.address_join
+	LEFT OUTER JOIN stgv_nimb_cont_address_street ON BINARY AllIDs.address_join = BINARY stgv_nimb_cont_address_street.address_join
+	LEFT OUTER JOIN stgv_nimb_cont_address_postcode ON BINARY AllIDs.address_join = BINARY stgv_nimb_cont_address_postcode.address_join
+WHERE BINARY street || city || county || postcode || country IS NOT NULL
+ORDER BY 1,2,3;
+------
 CREATE OR REPLACE VIEW stgv_nimb_cont_phone AS
 SELECT DISTINCT `cont_id`,`modifier` AS 'type' ,`value` AS 'phone' FROM `rec_nimb_cont_det_sub` WHERE `field` = 'phone';
 ---
@@ -296,6 +360,24 @@ SELECT cont_id,
 	last_qual,
 	cipd_no
 FROM rec_nimb_cont_det;
+---
+CREATE OR REPLACE VIEW stgv_nimb_cont_comp AS
+SELECT `cont_id`
+	,`owner_id`
+	,`created_datetime`
+	,`created_date`
+	,`created_time`
+	,`creator`
+	,`updated_datetime`
+	,`updated_date`
+	,`updated_time`
+	,`updater`
+	,`company_name`
+	,`parent_company`
+	,`area`
+	,`avatar_url`
+FROM `stgv_nimb_cont_det`
+WHERE `record_type`='company'
 -- --------------------------------------------------------
 --
 -- Stored Procedures
@@ -304,26 +386,16 @@ DELIMITER //
 CREATE OR REPLACE PROCEDURE load_rectostg()
 BEGIN
 	TRUNCATE stg_nimb_cont_id;
-	INSERT INTO stg_nimb_cont_id
+	INSERT IGNORE INTO stg_nimb_cont_id
 	SELECT DISTINCT * FROM rec_nimb_cont_id;
+	
 	TRUNCATE stg_nimb_cont_id;
 	INSERT IGNORE INTO stg_nimb_cont_det
 	SELECT DISTINCT * FROM stgv_nimb_cont_det;
-	TRUNCATE stg_nimb_cont_address_city;
-	TRUNCATE stg_nimb_cont_address_country;
-	TRUNCATE stg_nimb_cont_address_county;
-	TRUNCATE stg_nimb_cont_address_street;
-	TRUNCATE stg_nimb_cont_address_postcode;
-	INSERT INTO stg_nimb_cont_address_city
-	SELECT DISTINCT * FROM stgv_nimb_cont_address_city;
-	INSERT INTO stg_nimb_cont_address_country
-	SELECT DISTINCT * FROM stgv_nimb_cont_address_country;
-	INSERT INTO stg_nimb_cont_address_county
-	SELECT DISTINCT * FROM stgv_nimb_cont_address_county;
-	INSERT INTO stg_nimb_cont_address_street
-	SELECT DISTINCT * FROM stgv_nimb_cont_address_street;
-	INSERT INTO stg_nimb_cont_address_postcode
-	SELECT DISTINCT * FROM stgv_nimb_cont_address_postcode;
+	
+	TRUNCATE stg_nimb_cont_address;
+	INSERT IGNORE INTO stg_nimb_cont_address
+	SELECT DISTINCT * FROM stgv_nimb_cont_address;
 	
 END //
 DELIMITER ;

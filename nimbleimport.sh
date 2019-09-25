@@ -4,7 +4,7 @@
 db_connect="mysql -h $db_hostname -u $db_user -p$db_pw $db_name -e"
 auth_bearer="Authorization: Bearer $api_key"
 trunc_statement="truncate "
-scrver="0.5"
+scrver="0.7"
 
 cont_full=""
 insert_fields=""
