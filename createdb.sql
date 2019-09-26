@@ -397,6 +397,18 @@ BEGIN
 	INSERT IGNORE INTO stg_nimb_cont_address
 	SELECT DISTINCT * FROM stgv_nimb_cont_address;
 	
+	TRUNCATE stg_nimb_cont_phone;
+	INSERT IGNORE INTO stg_nimb_cont_phone
+	SELECT DISTINCT * FROM stgv_nimb_cont_phone;
+	
+	TRUNCATE stg_nimb_cont_url;
+	INSERT IGNORE INTO stg_nimb_cont_url
+	SELECT DISTINCT * FROM stgv_nimb_cont_url;
+	
+	TRUNCATE stg_nimb_cont_description;
+	INSERT IGNORE INTO stg_nimb_cont_description
+	SELECT DISTINCT * FROM stgv_nimb_cont_description;
+	
 END //
 DELIMITER ;
 
